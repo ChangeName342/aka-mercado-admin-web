@@ -1,6 +1,5 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
 const User = require('./models/User');
 
 passport.use(new LocalStrategy(
@@ -12,13 +11,12 @@ passport.use(new LocalStrategy(
         return done(null, false, { message: 'Usuario no encontrado' });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
+      // Comprobar si la contraseña coincide sin cifrar
+      if (password === user.password) {
+        return done(null, user);
+      } else {
         return done(null, false, { message: 'Contraseña incorrecta' });
       }
-
-      return done(null, user);
 
     } catch (err) {
       return done(err);
